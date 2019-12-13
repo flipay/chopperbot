@@ -4,6 +4,7 @@ defmodule Chopperbot.Split do
   TODO:
   [ ] Make share order more intuitive ex. a 100 b 200 share 500
   [ ] add flexible discount ex. -10%
+  [ ] [Bug] String.split wrong on copy & paste the command in Slack
   """
   @spec run(String.t()) :: String.t()
   def run(text) do
