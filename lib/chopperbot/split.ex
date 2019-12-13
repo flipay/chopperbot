@@ -2,7 +2,7 @@ defmodule Chopperbot.Split do
   @moduledoc """
 
   TODO:
-  [ ] Add share orders
+  [ ] Make share order more intuitive ex. a 100 b 200 share 500
   [ ] add flexible discount ex. -10%
   """
   @spec run(String.t()) :: String.t()
@@ -22,6 +22,7 @@ defmodule Chopperbot.Split do
     |> Enum.join("\n")
   end
 
+  @spec apply_options(list(), list()) :: list()
   def apply_options(orders, ["+service" | rest]), do: apply_options(orders, ["+s" | rest])
   def apply_options(orders, ["+vat" | rest]), do: apply_options(orders, ["+v" | rest])
 
@@ -37,6 +38,23 @@ defmodule Chopperbot.Split do
       Enum.map(orders, fn {name, amount} -> {name, rounding_floating_problem(amount * 1.07)} end),
       rest
     )
+  end
+
+  def apply_options(orders, [opt | rest]) do
+    new_orders =
+      cond do
+        # split share amount in "+share1000" to all orders
+        String.starts_with?(opt, "+share") ->
+          ["", amount] = String.split(opt, "+share")
+          {float_amount, ""} = Float.parse(amount)
+          share_portion = float_amount / length(orders)
+
+          Enum.map(orders, fn {name, amount} ->
+            {name, rounding_floating_problem(amount + share_portion)}
+          end)
+      end
+
+    apply_options(new_orders, rest)
   end
 
   def apply_options(orders, []), do: orders

@@ -10,7 +10,7 @@ defmodule Chopperbot.SplitTest do
 
   describe "format_to_string/1" do
     test "can format list total to string" do
-      assert "kendo 300\nneo 400\nturbo 300\n_total 1000" ==
+      assert "kendo: 300 THB\nneo: 400 THB\nturbo: 300 THB\n*total: 1000 THB*" ==
                Split.format_string([
                  {"kendo", 300},
                  {"neo", 400},
@@ -51,6 +51,22 @@ defmodule Chopperbot.SplitTest do
                {"neo", 470.8},
                {"turbo", 353.1}
              ] == Split.apply_options(@sum_orders, ["+vat", "+service"])
+    end
+
+    test "can add share order" do
+      assert [
+               {"kendo", 600},
+               {"neo", 700},
+               {"turbo", 600}
+             ] == Split.apply_options(@sum_orders, ["+share900"])
+    end
+
+    test "can add share order and service charge" do
+      assert [
+               {"kendo", 660},
+               {"neo", 770},
+               {"turbo", 660}
+             ] == Split.apply_options(@sum_orders, ["+share900", "+s"])
     end
   end
 
