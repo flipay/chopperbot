@@ -10,6 +10,7 @@ defmodule Chopperbot.Application do
     children = [
       # Starts a worker by calling: Chopperbot.Worker.start_link(arg)
       # {Chopperbot.Worker, arg}
+      {Plug.Cowboy, scheme: :http, plug: Chopperbot.Router, options: [port: 4000]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
