@@ -15,7 +15,9 @@ defmodule Chopperbot.Router do
       "text" => "Hey guys! 🤩"
     }
 
-    send_resp(conn, 200, Jason.encode!(body))
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Jason.encode!(body))
   end
 
   match _ do
