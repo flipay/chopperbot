@@ -12,7 +12,7 @@ defmodule Chopperbot.Router do
   post "/split" do
     body = %{
       "response_type" => "in_channel",
-      "text" => "Hey guys! 🤩"
+      "text" => Chopperbot.Split.run(conn.body_params["text"])
     }
 
     conn
