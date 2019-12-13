@@ -1,21 +1,22 @@
 # Chopperbot
 
-**TODO: Add description**
+Your daily cute assistant in Flipay
 
-## Installation
+## Usage 1: Split the bill
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `chopperbot` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:chopperbot, "~> 0.1.0"}
-  ]
-end
+You can get the help from chopper to calculate your bill with this syntax.
+```
+/split NAME AMOUNT NAME AMOUNT ... [+v | +s]
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/chopperbot](https://hexdocs.pm/chopperbot).
 
+Ex.
+
+```
+/split turbo 100 turbo 200 kendo 300 neo 400
+Chopper:
+turbo 300
+kendo 300
+neo 400
+total 1000
+```
