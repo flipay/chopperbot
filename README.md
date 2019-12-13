@@ -24,3 +24,20 @@ kendo 330
 neo 440
 total 1100
 ```
+
+
+## Deployment
+
+For the first time, add the remote to Gigalixir.  
+`GIGALIXIR_REMOTE_URL` can be found in the setup instruction.  
+```
+git remote add gigalixir GIGALIXIR_REMOTE_URL
+```
+
+Once you have the gigalixir remote, just push to build.
+```
+git push gigalixir master
+```
+
+The application will be avilable on    
+https://APP_NAME.gigalixirapp.com/
