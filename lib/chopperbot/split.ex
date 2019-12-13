@@ -11,6 +11,7 @@ defmodule Chopperbot.Split do
     |> process_input()
     |> calculate_total()
     |> format_string()
+    |> add_character_talk()
   end
 
   def format_string(list_total) do
@@ -20,6 +21,27 @@ defmodule Chopperbot.Split do
       {name, amount} -> "#{name}: #{amount} THB"
     end)
     |> Enum.join("\n")
+  end
+
+  @doc """
+  Make the bot cuter with the actual quote of Chopper
+  ref: https://koei.fandom.com/wiki/Tony_Tony_Chopper/Quotes
+  """
+  def add_character_talk(text) do
+    talk =
+      Enum.random([
+        "Wowww! I'm rocking this!",
+        "All right! I got 'em!",
+        "This is this power I've got!",
+        "I want to be the sort of man people can rely on!",
+        "I gotta give my all for everyone in my crew!",
+        "Hey! I did it!",
+        "I will be even more dependable!",
+        "I am a brash... monster!",
+        "Wowowow!!! I'm so strooong!"
+      ])
+
+    "#{talk}\n\n#{text}"
   end
 
   @spec apply_options(list(), list()) :: list()

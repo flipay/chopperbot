@@ -39,6 +39,22 @@ total 1300
 ```
 
 
+## Development
+
+Run the cowboy server
+```sh
+mix run --no-halt
+```
+
+Test by posting json data to the endpoint
+```
+POST localhost:4000/split
+
+{
+	"text": "turbo 100 turbo 200 kendo 300 neo 400"
+}
+```
+
 ## Deployment
 
 For the first time, add the remote to Gigalixir.  
