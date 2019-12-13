@@ -3,7 +3,6 @@ defmodule Chopperbot.Split do
 
   TODO:
   [ ] Add share orders
-  [ ] Add vat / service
   [ ] add flexible discount ex. -10%
   """
   @spec run(String.t()) :: String.t()
@@ -16,29 +15,49 @@ defmodule Chopperbot.Split do
 
   def format_string(list_total) do
     list_total
-    |> Enum.map(fn {name, amount} -> "#{name} #{amount}" end)
+    |> Enum.map(fn
+      {"_total", amount} -> "*total: #{amount} THB*"
+      {name, amount} -> "#{name}: #{amount} THB"
+    end)
     |> Enum.join("\n")
   end
 
-  def calculate_total(%{orders: orders, options: _options} = _parsed_input) do
+  def apply_options(orders, ["+service" | rest]), do: apply_options(orders, ["+s" | rest])
+  def apply_options(orders, ["+vat" | rest]), do: apply_options(orders, ["+v" | rest])
+
+  def apply_options(orders, ["+s" | rest]) do
+    apply_options(
+      Enum.map(orders, fn {name, amount} -> {name, rounding_floating_problem(amount * 1.10)} end),
+      rest
+    )
+  end
+
+  def apply_options(orders, ["+v" | rest]) do
+    apply_options(
+      Enum.map(orders, fn {name, amount} -> {name, rounding_floating_problem(amount * 1.07)} end),
+      rest
+    )
+  end
+
+  def apply_options(orders, []), do: orders
+
+  # FIXME: use the proper way to handle the float precision
+  defp rounding_floating_problem(float), do: round(float * 100) / 100
+
+  def calculate_total(%{orders: orders, options: options} = _parsed_input) do
     sum_orders =
       orders
       |> Enum.group_by(fn {name, _amount} -> name end)
-      |> Enum.map(fn {name, list} ->
-        {
-          name,
-          list
-          |> Enum.map(fn {_name, amount} -> amount end)
-          |> Enum.sum()
-        }
-      end)
+      |> Enum.map(fn {name, orders} -> {name, sum_amount(orders)} end)
+      |> apply_options(options)
 
-    total =
-      sum_orders
-      |> Enum.map(fn {_name, amount} -> amount end)
-      |> Enum.sum()
+    sum_orders ++ [{"_total", sum_amount(sum_orders)}]
+  end
 
-    sum_orders ++ [{"_total", total}]
+  defp sum_amount(orders) do
+    orders
+    |> Enum.map(fn {_name, amount} -> amount end)
+    |> Enum.sum()
   end
 
   @spec process_input(String.t()) :: map()
