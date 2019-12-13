@@ -8,7 +8,7 @@ You can get the help from chopper to calculate your bill with this syntax.
 ```
 /split NAME AMOUNT NAME AMOUNT ... [+v | +s]
 ```
-![image](https://user-images.githubusercontent.com/761819/70817917-315bf000-1e05-11ea-9384-f4fa718004d9.png)
+![image](https://user-images.githubusercontent.com/761819/70823863-7850e200-1e13-11ea-8884-29789549ff32.png)
 
 The option can use to apply multiplication to all orders.   
 Note that the order of options matter in the calculation.
