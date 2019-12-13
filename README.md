@@ -70,3 +70,9 @@ git push gigalixir master
 
 The application will be avilable on    
 https://APP_NAME.gigalixirapp.com/
+
+
+## Reference
+
+For the detail on setting up Slack application, please check    
+https://www.monterail.com/blog/building-slackbot-with-elixir-phoenix
