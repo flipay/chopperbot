@@ -1,6 +1,6 @@
 # Chopperbot
 
-Your daily cute assistant in Flipay
+Your cute slack bot assistant
 
 ## Usage 1: Split the bill
 
