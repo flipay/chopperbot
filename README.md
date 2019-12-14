@@ -40,19 +40,41 @@ total 1300
 
 ## Development
 
+### For Slack
+
 Run the cowboy server
 ```sh
-mix run --no-halt
+iex -S mix
 ```
 
 Test by posting json data to the endpoint
-```
-POST localhost:4000/split
+`POST localhost:4000/split`
 
+```json
 {
 	"text": "turbo 100 turbo 200 kendo 300 neo 400"
 }
 ```
+
+### For LINE
+
+Run the cowboy server with the channel access token
+```sh
+LINE_CHANNEL_ACCESS_TOKEN=xxxxx iex -S mix
+```
+
+Test by posting json data to the endpoint
+`POST localhost:4000/line`
+
+```json
+{
+	"events": [{
+		"message": { "text": "turbo 100 turbo 200 kendo 300 neo 400"},
+		"replyToken": "anything"
+	}]
+}
+```
+
 
 ## Deployment
 
