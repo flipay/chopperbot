@@ -2,6 +2,7 @@ defmodule Chopperbot.Split do
   @moduledoc """
 
   TODO:
+  [ ] Format currency number (to have comma)
   [ ] add flexible discount ex. -10%
   [ ] [Bug] String.split wrong on copy & paste the command in Slack
   """
