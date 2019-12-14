@@ -15,7 +15,6 @@ Note that the order of options matter in the calculation.
 ```
 +v means add vat 7%
 +s means add service charge 10%
-+share500 means share order 500 among all people
 ```
 
 Ex. Add service charge
@@ -28,9 +27,9 @@ neo 440
 total 1100
 ```
 
-Ex. Add share dish
+Ex. Add share dish ("share" is for sharing dish)
 ```
-/split turbo 100 turbo 200 kendo 300 neo 400 +share300
+/split turbo 100 turbo 200 kendo 300 neo 400 share 300
 Chopper:
 turbo 400
 kendo 400

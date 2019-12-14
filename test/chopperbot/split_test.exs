@@ -42,21 +42,5 @@ defmodule Chopperbot.SplitTest do
                {"turbo", 353.1}
              ] == Split.apply_options(@sum_orders, ["+vat", "+service"])
     end
-
-    test "can add share order" do
-      assert [
-               {"kendo", 600},
-               {"neo", 700},
-               {"turbo", 600}
-             ] == Split.apply_options(@sum_orders, ["+share900"])
-    end
-
-    test "can add share order and service charge" do
-      assert [
-               {"kendo", 660},
-               {"neo", 770},
-               {"turbo", 660}
-             ] == Split.apply_options(@sum_orders, ["+share900", "+s"])
-    end
   end
 end
