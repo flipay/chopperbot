@@ -1,5 +1,6 @@
 defmodule Chopperbot.Router do
   use Plug.Router
+  alias Chopperbot.{Character, Split}
 
   plug(:match)
   plug(Plug.Parsers, parsers: [:json, :urlencoded], json_decoder: Jason)
@@ -10,9 +11,12 @@ defmodule Chopperbot.Router do
   end
 
   post "/split" do
+    input = conn.body_params["text"]
+    response = Character.happy_talk() <> "\n\n" <> Split.run(input)
+
     body = %{
       "response_type" => "in_channel",
-      "text" => Chopperbot.Split.run(conn.body_params["text"])
+      "text" => response
     }
 
     conn

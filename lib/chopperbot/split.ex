@@ -6,43 +6,37 @@ defmodule Chopperbot.Split do
   [ ] add flexible discount ex. -10%
   [ ] [Bug] String.split wrong on copy & paste the command in Slack
   """
+
+  @doc """
+  Process text input for /split to result
+
+  ## Examples
+      iex> run("a 100 a 200 b 300 +v +s")
+      "a: 353.1 THB\\nb: 353.1 THB\\n*total: 706.2 THB*"
+  """
   @spec run(String.t()) :: String.t()
   def run(text) do
     text
     |> process_input()
-    |> calculate_total()
-    |> format_string()
-    |> add_character_talk()
+    |> calculate_orders()
+    |> add_total()
+    |> format_slack_string()
   end
 
-  def format_string(list_total) do
+  @doc """
+  Convert the list of calculated order to slack-compatible string
+
+  ## Examples
+      iex> format_slack_string([{"a", 300}, {"b", 400}, {"c", 300}, {"_total", 1000}])
+      "a: 300 THB\\nb: 400 THB\\nc: 300 THB\\n*total: 1000 THB*"
+  """
+  def format_slack_string(list_total) do
     list_total
     |> Enum.map(fn
       {"_total", amount} -> "*total: #{amount} THB*"
       {name, amount} -> "#{name}: #{amount} THB"
     end)
     |> Enum.join("\n")
-  end
-
-  @doc """
-  Make the bot cuter with the actual quote of Chopper
-  ref: https://koei.fandom.com/wiki/Tony_Tony_Chopper/Quotes
-  """
-  def add_character_talk(text) do
-    talk =
-      Enum.random([
-        "Wowww! I'm rocking this!",
-        "All right! I got 'em!",
-        "This is this power I've got!",
-        "I want to be the sort of man people can rely on!",
-        "I gotta give my all for everyone in my crew!",
-        "Hey! I did it!",
-        "I will be even more dependable!",
-        "I am a brash... monster!",
-        "Wowowow!!! I'm so strooong!"
-      ])
-
-    "#{talk}\n\n#{text}"
   end
 
   @spec apply_options(list(), list()) :: list()
@@ -85,22 +79,50 @@ defmodule Chopperbot.Split do
   # FIXME: use the proper way to handle the float precision
   defp rounding_floating_problem(float), do: round(float * 100) / 100
 
-  def calculate_total(%{orders: orders, options: options} = _parsed_input) do
+  @doc """
+  group and sum the order with the same name from process_input
+
+  ## Examples
+      iex> calculate_orders(%{orders: [{"a", 100}, {"a", 200}, {"b", 300}, {"c", 400}], options: []})
+      [{"a", 300}, {"b", 300}, {"c", 400}]
+      iex> calculate_orders(%{orders: [{"a", 100}, {"b", 300}], options: ["+s"]})
+      [{"a", 110.0}, {"b", 330.0}]
+  """
+  @spec calculate_orders(%{options: [binary], orders: [...]}) :: [...]
+  def calculate_orders(%{orders: orders, options: options} = _parsed_input) do
     sum_orders =
       orders
       |> Enum.group_by(fn {name, _amount} -> name end)
-      |> Enum.map(fn {name, orders} -> {name, sum_amount(orders)} end)
+      |> Enum.map(fn {name, orders} -> {name, sum_orders_amount(orders)} end)
       |> apply_options(options)
 
-    sum_orders ++ [{"_total", sum_amount(sum_orders)}]
+    sum_orders
   end
 
-  defp sum_amount(orders) do
+  @doc """
+  add _total amount to order
+
+  ## Examples
+      iex> add_total([{"a", 300}, {"b", 300}, {"c", 400}])
+      [{"a", 300}, {"b", 300}, {"c", 400}, {"_total", 1000}]
+  """
+  def add_total(orders) do
+    orders ++ [{"_total", sum_orders_amount(orders)}]
+  end
+
+  defp sum_orders_amount(orders) do
     orders
     |> Enum.map(fn {_name, amount} -> amount end)
     |> Enum.sum()
   end
 
+  @doc """
+  process text into the correct orders & options
+
+  ## Examples
+      iex> process_input("a 100 a 200 b 300 +v +s")
+      %{orders: [{"a", 100.0}, {"a", 200.0}, {"b", 300.0}], options: ["+v", "+s"]}
+  """
   @spec process_input(String.t()) :: map()
   def process_input(text) do
     %{
@@ -109,13 +131,21 @@ defmodule Chopperbot.Split do
     }
   end
 
-  @spec parse_options(String.t()) :: list()
-  def parse_options(text) do
-    text
-    |> String.split(" ")
-    |> Enum.filter(fn s -> option?(s) end)
-  end
+  @doc """
+  Extract options out of the text into the list
 
+  ## Example
+      iex> parse_orders("turbo 10 kendo 200 +v +s")
+      [{"turbo", 10.0}, {"kendo", 200.0}]
+      iex> parse_orders("neo 310 -5%")
+      [{"neo", 310.0}]
+      iex> parse_orders("satoshi 10.9 takeshi 390.13")
+      [{"satoshi", 10.9}, {"takeshi", 390.13}]
+      iex> parse_orders("+vat +service")
+      []
+      iex> parse_orders("")
+      []
+  """
   @spec parse_orders(String.t()) :: [...]
   def parse_orders(text) do
     text
@@ -127,6 +157,29 @@ defmodule Chopperbot.Split do
         {float_amount, ""} = Float.parse(amount)
         {name, float_amount}
     end)
+  end
+
+  @doc """
+  Extract options (anything beginning with +/-) out of
+  the input text into the list
+
+  ## Example
+      iex> parse_options("d 10 a 200 +vat +service")
+      ["+vat", "+service"]
+      iex> parse_options("a 500 +v +s b 200 +t")
+      ["+v", "+s", "+t"]
+      iex> parse_options("d 10 a 200 +7% +10% -5%")
+      ["+7%", "+10%", "-5%"]
+      iex> parse_options("d 10 a 200 z 200")
+      []
+      iex> parse_options("")
+      []
+  """
+  @spec parse_options(String.t()) :: list()
+  def parse_options(text) do
+    text
+    |> String.split(" ")
+    |> Enum.filter(fn s -> option?(s) end)
   end
 
   defp option?(string), do: String.match?(string, ~r/^[+-]/)
