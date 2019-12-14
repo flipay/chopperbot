@@ -2,6 +2,7 @@ defmodule Chopperbot.Split do
   @moduledoc """
 
   TODO:
+  [ ] add support for LINE format
   [ ] add flexible discount ex. -10%
   [ ] [Bug] String.split wrong on copy & paste the command in Slack
   """
@@ -14,9 +15,9 @@ defmodule Chopperbot.Split do
 
   ## Examples
       iex> run("a 100 a 200 b 300 +v +s")
-      "a: 353.10 THB\\nb: 353.10 THB\\n*total: 706.20 THB*"
+      "a: 353.10 THB\\nb: 353.10 THB\\n---\\n*total: 706.20 THB*"
       iex> run("a 1100 b 300 share 200 +s")
-      "a: 1,320.00 THB\\nb: 440.00 THB\\n*total: 1,760.00 THB*"
+      "a: 1,320.00 THB\\nb: 440.00 THB\\n---\\n*total: 1,760.00 THB*"
   """
   @spec run(String.t()) :: String.t()
   def run(text) do
@@ -35,13 +36,13 @@ defmodule Chopperbot.Split do
 
   ## Examples
       iex> format_slack_string([{"a", 300}, {"b", 400}, {"c", 300}, {"_total", 1000}])
-      "a: 300.00 THB\\nb: 400.00 THB\\nc: 300.00 THB\\n*total: 1,000.00 THB*"
+      "a: 300.00 THB\\nb: 400.00 THB\\nc: 300.00 THB\\n---\\n*total: 1,000.00 THB*"
   """
   @spec format_slack_string(orders()) :: String.t()
   def format_slack_string(total_orders) do
     total_orders
     |> Enum.map(fn
-      {"_total", amount} -> "*total: #{format_money(amount)} THB*"
+      {"_total", amount} -> "---\n*total: #{format_money(amount)} THB*"
       {name, amount} -> "#{name}: #{format_money(amount)} THB"
     end)
     |> Enum.join("\n")

@@ -16,4 +16,13 @@ defmodule Chopperbot.Character do
       "Wowowow!!! I'm so strooong!"
     ])
   end
+
+  def confused_talk() do
+    Enum.random([
+      "Sorry, I am confusing.",
+      "At least my nose isn't big and red.",
+      "Sorry!! I'll patch you up once this is over, 'kay?!",
+      "Hope no one minds if we take this."
+    ])
+  end
 end
