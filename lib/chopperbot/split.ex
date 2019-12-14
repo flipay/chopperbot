@@ -136,7 +136,7 @@ defmodule Chopperbot.Split do
   defp rounding_floating_problem(float), do: round(float * 100) / 100
 
   @doc """
-  process text into the correct orders & options
+  process text into the correct orders & options.
 
   ## Examples
       iex> process_input("a 100 a 200 b 300 +v +s")
@@ -151,13 +151,14 @@ defmodule Chopperbot.Split do
   end
 
   @doc """
-  Extract options out of the text into the list
+  Extract options out of the text into the list.
+  will make all name lower case for the sake of comparison.
 
   ## Example
       iex> parse_orders("turbo 10 kendo 200 +v +s")
       [{"turbo", 10.0}, {"kendo", 200.0}]
-      iex> parse_orders("neo 310 -5%")
-      [{"neo", 310.0}]
+      iex> parse_orders("Neo 310 neo 19 -5%")
+      [{"neo", 310.0}, {"neo", 19.0}]
       iex> parse_orders("satoshi 10.9 takeshi 390.13")
       [{"satoshi", 10.9}, {"takeshi", 390.13}]
       iex> parse_orders("+vat +service")
@@ -174,18 +175,19 @@ defmodule Chopperbot.Split do
     |> Enum.map(fn
       [name, amount] ->
         {float_amount, ""} = Float.parse(amount)
-        {name, float_amount}
+        {String.downcase(name), float_amount}
     end)
   end
 
   @doc """
   Extract options (anything beginning with +/-) out of
-  the input text into the list
+  the input text into the list.
+  will make all name lower case for the sake of comparison.
 
   ## Example
       iex> parse_options("d 10 a 200 +vat +service")
       ["+vat", "+service"]
-      iex> parse_options("a 500 +v +s b 200 +t")
+      iex> parse_options("a 500 +V +s b 200 +T")
       ["+v", "+s", "+t"]
       iex> parse_options("d 10 a 200 +7% +10% -5%")
       ["+7%", "+10%", "-5%"]
@@ -199,6 +201,7 @@ defmodule Chopperbot.Split do
     text
     |> String.split(" ")
     |> Enum.filter(fn s -> option?(s) end)
+    |> Enum.map(&String.downcase/1)
   end
 
   defp option?(string), do: String.match?(string, ~r/^[+-]/)
