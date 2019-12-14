@@ -6,8 +6,8 @@ defmodule Chopperbot.Split do
   [ ] [Bug] String.split wrong on copy & paste the command in Slack
   """
 
-  @type orders() :: list({String.t(), float() | integer()})
-  @type options() :: list(String.t())
+  @type orders :: list({String.t(), float() | integer()})
+  @type options :: list(String.t())
 
   @doc """
   Process text input for /split to result
