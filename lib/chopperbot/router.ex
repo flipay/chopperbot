@@ -39,7 +39,7 @@ defmodule Chopperbot.Router do
         Character.happy_talk() <> "\n\n" <> Split.run(input)
       else
         [
-          "Now I can help you split the bill 💸! Just type `split` following by orders like one of these...",
+          "Now I can help you split the bill 💸! Just type `split` following by orders. For example...",
           "",
           "1️⃣",
           "split alice 100 alice 250 bob 200 +vat +service",
