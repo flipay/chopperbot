@@ -158,6 +158,8 @@ defmodule Chopperbot.Split do
   ## Example
       iex> parse_orders("turbo 10 kendo 200 +v +s")
       [{"turbo", 10.0}, {"kendo", 200.0}]
+      iex> parse_orders("ant 200 pipe 100 share -30 +v +s")
+      [{"ant", 200.0}, {"pipe", 100.0}, {"share", -30.0}]
       iex> parse_orders("Neo 310 neo 19 -5%")
       [{"neo", 310.0}, {"neo", 19.0}]
       iex> parse_orders("satoshi 10.9 takeshi 390.13")
@@ -205,5 +207,13 @@ defmodule Chopperbot.Split do
     |> Enum.map(&String.downcase/1)
   end
 
-  defp option?(string), do: String.match?(string, ~r/^[+-]/)
+  defp option?(string), do: not number?(string) and String.match?(string, ~r/^[+-]/)
+
+  defp number?(string) do
+    with {_float_amount, remaining} <- Float.parse(string) do
+      remaining == ""
+    else
+      _ -> false
+    end
+  end
 end
