@@ -1,10 +1,16 @@
 # Chopperbot
 
-Your cute slack bot assistant
+Your cute Slack & LINE bot assistant.
+
+You can play with Chopperbot in LINE by scanning QR code below.
+
+<img width="253" alt="image" src="https://user-images.githubusercontent.com/761819/71999646-60cf1280-3274-11ea-86b1-13be27537bca.png">
+
 
 ## Usage 1: Split the bill
 
-You can get the help from chopper to calculate your bill with this syntax.
+You can get the help from chopper to calculate your bill with this syntax.    
+(For LINE, don't use slash, start with just `split`)
 ```
 /split NAME AMOUNT NAME AMOUNT ... [+v | +s]
 ```
