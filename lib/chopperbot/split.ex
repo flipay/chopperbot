@@ -142,18 +142,12 @@ defmodule Chopperbot.Split do
 
   defp get_multiplier_from_option(option) do
     regex = ~r/^(\+|-)(\d+|\d+[.]\d+)(%)$/
+    [^option, operator, number, "%"] = Regex.run(regex, option)
+    {float_number, ""} = Float.parse(number)
 
-    case Regex.run(regex, option) do
-      [^option, operator, number, "%"] ->
-        {float_number, ""} = Float.parse(number)
-
-        Kernel
-        |> apply(String.to_existing_atom(operator), [100, float_number])
-        |> Kernel./(100)
-
-      _not_matched ->
-        1
-    end
+    Kernel
+    |> apply(String.to_existing_atom(operator), [100, float_number])
+    |> Kernel./(100)
   end
 
   # FIXME: use the proper way to handle the float precision
