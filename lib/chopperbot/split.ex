@@ -112,26 +112,51 @@ defmodule Chopperbot.Split do
   ## Examples
       iex> apply_options([{"a", 300}, {"b", 400}], ["+s"])
       [{"a", 330.0}, {"b", 440.0}]
+      iex> apply_options([{"a", 100}, {"b", 200}], ["-20.5%"])
+      [{"a", 79.5}, {"b", 159.0}]
   """
   @spec apply_options(orders(), options()) :: orders()
-  def apply_options(orders, ["+service" | rest]), do: apply_options(orders, ["+s" | rest])
-  def apply_options(orders, ["+vat" | rest]), do: apply_options(orders, ["+v" | rest])
-
-  def apply_options(orders, ["+s" | rest]) do
-    apply_options(
-      Enum.map(orders, fn {name, amount} -> {name, rounding_floating_problem(amount * 1.10)} end),
-      rest
-    )
+  def apply_options(orders, options) do
+    Enum.reduce(options, orders, fn option, modified_orders ->
+      apply_option(modified_orders, option)
+    end)
   end
 
-  def apply_options(orders, ["+v" | rest]) do
-    apply_options(
-      Enum.map(orders, fn {name, amount} -> {name, rounding_floating_problem(amount * 1.07)} end),
-      rest
-    )
+  defp apply_option(orders, option) do
+    Enum.map(orders, fn {name, amount} ->
+      new_amount =
+        option
+        |> get_multiplier_from_option()
+        |> Kernel.*(amount)
+        |> rounding_floating_problem()
+
+      {name, new_amount}
+    end)
   end
 
-  def apply_options(orders, []), do: orders
+  defp get_multiplier_from_option(option) when option in ["+service", "+s"] do
+    get_multiplier_from_option("+10%")
+  end
+
+  defp get_multiplier_from_option(option) when option in ["+vat", "+v"] do
+    get_multiplier_from_option("+7%")
+  end
+
+  defp get_multiplier_from_option(option) do
+    regex = ~r/^(\+|-)(\d+|\d+[.]\d+)(%)$/
+
+    case Regex.run(regex, option) do
+      [^option, operator, number, "%"] ->
+        {float_number, ""} = Float.parse(number)
+
+        Kernel
+        |> apply(String.to_existing_atom(operator), [100, float_number])
+        |> Kernel./(100)
+
+      _not_matched ->
+        1
+    end
+  end
 
   # FIXME: use the proper way to handle the float precision
   defp rounding_floating_problem(float), do: round(float * 100) / 100
