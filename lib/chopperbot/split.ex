@@ -116,14 +116,9 @@ defmodule Chopperbot.Split do
       [{"a", 79.5}, {"b", 159.0}]
   """
   @spec apply_options(orders(), options()) :: orders()
-  def apply_options(orders, options) do
-    Enum.reduce(options, orders, fn option, modified_orders ->
-      apply_option(modified_orders, option)
-    end)
-  end
-
-  defp apply_option(orders, option) do
-    Enum.map(orders, fn {name, amount} ->
+  def apply_options(orders, [option | rest_options]) do
+    orders
+    |> Enum.map(fn {name, amount} ->
       new_amount =
         option
         |> get_multiplier_from_option()
@@ -132,7 +127,10 @@ defmodule Chopperbot.Split do
 
       {name, new_amount}
     end)
+    |> apply_options(rest_options)
   end
+
+  def apply_options(orders, []), do: orders
 
   defp get_multiplier_from_option(option) when option in ["+service", "+s"] do
     get_multiplier_from_option("+10%")
