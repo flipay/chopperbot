@@ -112,26 +112,43 @@ defmodule Chopperbot.Split do
   ## Examples
       iex> apply_options([{"a", 300}, {"b", 400}], ["+s"])
       [{"a", 330.0}, {"b", 440.0}]
+      iex> apply_options([{"a", 100}, {"b", 200}], ["-20.5%"])
+      [{"a", 79.5}, {"b", 159.0}]
   """
   @spec apply_options(orders(), options()) :: orders()
-  def apply_options(orders, ["+service" | rest]), do: apply_options(orders, ["+s" | rest])
-  def apply_options(orders, ["+vat" | rest]), do: apply_options(orders, ["+v" | rest])
+  def apply_options(orders, [option | rest_options]) do
+    orders
+    |> Enum.map(fn {name, amount} ->
+      new_amount =
+        option
+        |> get_multiplier_from_option()
+        |> Kernel.*(amount)
+        |> rounding_floating_problem()
 
-  def apply_options(orders, ["+s" | rest]) do
-    apply_options(
-      Enum.map(orders, fn {name, amount} -> {name, rounding_floating_problem(amount * 1.10)} end),
-      rest
-    )
-  end
-
-  def apply_options(orders, ["+v" | rest]) do
-    apply_options(
-      Enum.map(orders, fn {name, amount} -> {name, rounding_floating_problem(amount * 1.07)} end),
-      rest
-    )
+      {name, new_amount}
+    end)
+    |> apply_options(rest_options)
   end
 
   def apply_options(orders, []), do: orders
+
+  defp get_multiplier_from_option(option) when option in ["+service", "+s"] do
+    get_multiplier_from_option("+10%")
+  end
+
+  defp get_multiplier_from_option(option) when option in ["+vat", "+v"] do
+    get_multiplier_from_option("+7%")
+  end
+
+  defp get_multiplier_from_option(option) do
+    regex = ~r/^(\+|-)(\d+|\d+[.]\d+)(%)$/
+    [^option, operator, number, "%"] = Regex.run(regex, option)
+    {float_number, ""} = Float.parse(number)
+
+    Kernel
+    |> apply(String.to_existing_atom(operator), [100, float_number])
+    |> Kernel./(100)
+  end
 
   # FIXME: use the proper way to handle the float precision
   defp rounding_floating_problem(float), do: round(float * 100) / 100
