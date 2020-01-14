@@ -57,7 +57,13 @@ defmodule Chopperbot.Router do
   end
 
   defp build_response(input_text) do
-    Character.happy_talk() <> "\n\n" <> Split.run(input_text)
+    case Split.run(input_text) do
+      {:ok, ok_msg} ->
+        Character.happy_talk() <> "\n\n" <> ok_msg
+
+      {:error, error_msg} ->
+        Character.confused_talk() <> "\n\n" <> error_msg
+    end
   end
 
   defp build_line_suggestion_response do

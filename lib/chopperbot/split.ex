@@ -3,11 +3,12 @@ defmodule Chopperbot.Split do
 
   TODO:
   [ ] add support for LINE format
-  [ ] add flexible discount ex. -10%
   [ ] [Bug] String.split wrong on copy & paste the command in Slack
   """
 
-  @type orders :: list({String.t(), float() | integer()})
+  alias Chopperbot.Split.{Order, Parser}
+
+  @type orders :: list(Order.t())
   @type options :: list(String.t())
 
   @doc """
@@ -15,20 +16,33 @@ defmodule Chopperbot.Split do
 
   ## Examples
       iex> run("a 100 a 200 b 300 +v +s")
-      "a: 353.10 THB\\nb: 353.10 THB\\n---\\n*total: 706.20 THB*"
-      iex> run("a 1100 b 300 share 200 +s")
-      "a: 1,320.00 THB\\nb: 440.00 THB\\n---\\n*total: 1,760.00 THB*"
-  """
-  @spec run(String.t()) :: String.t()
-  def run(text) do
-    %{orders: orders, options: options} = process_input(text)
+      {:ok, "a: 353.10 THB\\nb: 353.10 THB\\n---\\n*total: 706.20 THB*"}
 
-    orders
-    |> sum_orders_by_name()
-    |> split_share()
-    |> apply_options(options)
-    |> add_total()
-    |> format_slack_string()
+      iex> run("a 1100 b 300 share 200 +s")
+      {:ok, "a: 1,320.00 THB\\nb: 440.00 THB\\n---\\n*total: 1,760.00 THB*"}
+
+      iex> run("a 1100 b 300 share 200 +invalid -haha")
+      {:error, "invalid options: +invalid, -haha"}
+  """
+  @spec run(String.t()) :: {:ok, String.t()} | {:error, String.t()}
+  def run(text) do
+    case Parser.parse(text) do
+      {:ok, %{orders: orders, multiplier: multiplier}} ->
+        result =
+          orders
+          |> sum_orders_by_name()
+          |> split_share()
+          |> apply_multiplier(multiplier)
+          |> add_total()
+          |> format_slack_string()
+
+        {:ok, result}
+
+      {:error, :invalid_option, invalid_options} ->
+        error_msg = "invalid options: " <> Enum.join(invalid_options, ", ")
+
+        {:error, error_msg}
+    end
   end
 
   @doc """
@@ -104,6 +118,13 @@ defmodule Chopperbot.Split do
     orders
     |> Enum.map(fn {_name, amount} -> amount end)
     |> Enum.sum()
+  end
+
+  defp apply_multiplier(orders, multiplier) do
+    Enum.map(orders, fn {name, amount} ->
+      new_amount = Float.round(amount * multiplier, 15)
+      {name, new_amount}
+    end)
   end
 
   @doc """
