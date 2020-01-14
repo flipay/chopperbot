@@ -103,6 +103,21 @@ defmodule Chopperbot.Split do
   end
 
   @doc """
+  Multiply each order amount with the given multiplier.
+
+  ## Examples
+      iex> apply_multiplier([{"a", 100}, {"b", 300}], 1.07)
+      [{"a", 107.0}, {"b", 321.0}]
+  """
+  @spec apply_multiplier(orders(), float()) :: orders()
+  def apply_multiplier(orders, multiplier) do
+    Enum.map(orders, fn {name, amount} ->
+      new_amount = Float.round(amount * multiplier, 15)
+      {name, new_amount}
+    end)
+  end
+
+  @doc """
   add _total amount to order
 
   ## Examples
@@ -118,12 +133,5 @@ defmodule Chopperbot.Split do
     orders
     |> Enum.map(fn {_name, amount} -> amount end)
     |> Enum.sum()
-  end
-
-  defp apply_multiplier(orders, multiplier) do
-    Enum.map(orders, fn {name, amount} ->
-      new_amount = Float.round(amount * multiplier, 15)
-      {name, new_amount}
-    end)
   end
 end
