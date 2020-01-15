@@ -9,7 +9,6 @@ defmodule Chopperbot.Split do
   alias Chopperbot.Split.{Order, Parser}
 
   @type orders :: list(Order.t())
-  @type options :: list(String.t())
 
   @doc """
   Process text input for /split to result
@@ -23,6 +22,9 @@ defmodule Chopperbot.Split do
 
       iex> run("a 1100 b 300 share 200 +invalid -haha")
       {:error, "invalid options: +invalid, -haha"}
+
+      iex> run("a 1100 b 300 share five dollars")
+      {:error, "invalid inputs: five, dollars"}
   """
   @spec run(String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def run(text) do
@@ -40,7 +42,10 @@ defmodule Chopperbot.Split do
 
       {:error, :invalid_option, invalid_options} ->
         error_msg = "invalid options: " <> Enum.join(invalid_options, ", ")
+        {:error, error_msg}
 
+      {:error, :invalid_input, invalid_inputs} ->
+        error_msg = "invalid inputs: " <> Enum.join(invalid_inputs, ", ")
         {:error, error_msg}
     end
   end

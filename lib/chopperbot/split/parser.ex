@@ -21,16 +21,22 @@ defmodule Chopperbot.Split.Parser do
 
       iex> parse("a 100 b 300 +t +invalid")
       {:error, :invalid_option, ["+t", "+invalid"]}
+
+      iex> parse("a one-hundred b ten baht +v +s")
+      {:error, :invalid_input, ["one-hundred", "ten", "baht"]}
   """
-  @spec parse(String.t()) :: {:ok, parsed()} | {:error, :invalid_option, [String.t()]}
+  @spec parse(String.t()) ::
+          {:ok, parsed()}
+          | {:error, :invalid_option, [String.t()]}
+          | {:error, :invalid_input, [String.t()]}
   def parse(text) do
     {options, inputs} =
       text
       |> String.split(@white_space_pattern, trim: true)
       |> Enum.split_with(&option?/1)
 
-    with {:ok, multiplier} <- OptionTransformer.transform(options) do
-      orders = InputTransformer.transform!(inputs)
+    with {:ok, multiplier} <- OptionTransformer.transform(options),
+         {:ok, orders} <- InputTransformer.transform(inputs) do
       {:ok, %{orders: orders, multiplier: multiplier}}
     end
   end
