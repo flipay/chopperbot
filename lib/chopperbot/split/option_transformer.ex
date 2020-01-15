@@ -25,7 +25,7 @@ defmodule Chopperbot.Split.OptionTransformer do
   """
   @spec transform([String.t()]) :: {:ok, float()} | {:error, :invalid_option, [String.t()]}
   def transform(options) do
-    case transform_to_multipliers([], [], options) do
+    case transform_to_multipliers(options) do
       {multipliers, []} ->
         {:ok, accumulate_multipliers(multipliers)}
 
@@ -34,25 +34,19 @@ defmodule Chopperbot.Split.OptionTransformer do
     end
   end
 
-  defp transform_to_multipliers(multipliers, invalid_options, [option | rest_options]) do
+  defp transform_to_multipliers(options, multipliers \\ [], invalid_options \\ [])
+
+  defp transform_to_multipliers([option | rest_options], multipliers, invalid_options) do
     case get_multiplier_from_option(option) do
       {:ok, multiplier} ->
-        transform_to_multipliers(
-          [multiplier | multipliers],
-          invalid_options,
-          rest_options
-        )
+        transform_to_multipliers(rest_options, [multiplier | multipliers], invalid_options)
 
       :error ->
-        transform_to_multipliers(
-          multipliers,
-          [option | invalid_options],
-          rest_options
-        )
+        transform_to_multipliers(rest_options, multipliers, [option | invalid_options])
     end
   end
 
-  defp transform_to_multipliers(multipliers, invalid_options, []) do
+  defp transform_to_multipliers([], multipliers, invalid_options) do
     {multipliers, Enum.reverse(invalid_options)}
   end
 
