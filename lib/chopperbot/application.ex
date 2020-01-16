@@ -6,11 +6,12 @@ defmodule Chopperbot.Application do
   use Application
 
   def start(_type, _args) do
+    port = Application.get_env(:chopperbot, :port)
     # List all child processes to be supervised
     children = [
       # Starts a worker by calling: Chopperbot.Worker.start_link(arg)
       {Chopperbot.Worker.HealthCheckWorker, nil},
-      {Plug.Cowboy, scheme: :http, plug: Chopperbot.Router, options: [port: 4000]}
+      {Plug.Cowboy, scheme: :http, plug: Chopperbot.Router, options: [port: port]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
