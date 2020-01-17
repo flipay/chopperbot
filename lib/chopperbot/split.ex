@@ -3,7 +3,6 @@ defmodule Chopperbot.Split do
 
   TODO:
   [ ] add support for LINE format
-  [ ] [Bug] String.split wrong on copy & paste the command in Slack
   """
 
   alias Chopperbot.Split.{Order, Parser}
