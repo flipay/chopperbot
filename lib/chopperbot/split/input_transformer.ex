@@ -11,7 +11,7 @@ defmodule Chopperbot.Split.InputTransformer do
       iex> transform(["ant", "200", "pipe", "100", "share", "-30"])
       {:ok, [{"ant", 200.0}, {"pipe", 100.0}, {"share", -30.0}]}
 
-      iex> transform(["Satoshi", "10.9", "Takeshi", "390.13", "satoshi", "112.50",])
+      iex> transform(["Satoshi", "10.9", "Takeshi", "390.13", "satoshi", "112.50"])
       {:ok, [{"satoshi", 10.9}, {"takeshi", 390.13}, {"satoshi", 112.5}]}
 
       iex> transform([])
@@ -41,22 +41,41 @@ defmodule Chopperbot.Split.InputTransformer do
 
   defp transform_to_orders(input_pairs, orders \\ [], invalid_inputs \\ [])
 
-  defp transform_to_orders([[name, amount] | rest_input_pairs], orders, invalid_inputs) do
-    case Float.parse(amount) do
-      {float_amount, ""} ->
-        order = {String.downcase(name), float_amount}
-        transform_to_orders(rest_input_pairs, [order | orders], invalid_inputs)
+  defp transform_to_orders([input_pair | rest_input_pairs], orders, invalid_inputs) do
+    with {:ok, name, amount} <- validate_input_pair(input_pair),
+         {:ok, float_amount} <- validate_amount_string(amount) do
+      order = {String.downcase(name), float_amount}
 
-      _ ->
-        transform_to_orders(rest_input_pairs, orders, [amount | invalid_inputs])
+      transform_to_orders(
+        rest_input_pairs,
+        [order | orders],
+        invalid_inputs
+      )
+    else
+      {:error, invalid_input} ->
+        transform_to_orders(
+          rest_input_pairs,
+          orders,
+          [invalid_input | invalid_inputs]
+        )
     end
-  end
-
-  defp transform_to_orders([[no_pair] | rest_input_pairs], orders, invalid_inputs) do
-    transform_to_orders(rest_input_pairs, orders, [no_pair | invalid_inputs])
   end
 
   defp transform_to_orders([], orders, invalid_inputs) do
     {Enum.reverse(orders), Enum.reverse(invalid_inputs)}
+  end
+
+  defp validate_input_pair(input_pair) do
+    case input_pair do
+      [name, amount] -> {:ok, name, amount}
+      [invalid_input] -> {:error, invalid_input}
+    end
+  end
+
+  defp validate_amount_string(string) do
+    case Float.parse(string) do
+      {float_number, ""} -> {:ok, float_number}
+      _ -> {:error, string}
+    end
   end
 end
