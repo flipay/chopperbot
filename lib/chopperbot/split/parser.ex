@@ -7,8 +7,6 @@ defmodule Chopperbot.Split.Parser do
 
   @white_space_pattern ~r/\p{Zs}/u
 
-  @type parsed :: %{orders: [Order.t()], multiplier: float()}
-
   @doc """
   Parse text into the correct orders & multiplier.
 
@@ -26,7 +24,7 @@ defmodule Chopperbot.Split.Parser do
       {:error, :invalid_input, ["one-hundred", "ten", "baht"]}
   """
   @spec parse(String.t()) ::
-          {:ok, parsed()}
+          {:ok, %{orders: [Order.t()], multiplier: float()}}
           | {:error, :invalid_option, [String.t()]}
           | {:error, :invalid_input, [String.t()]}
   def parse(text) do
