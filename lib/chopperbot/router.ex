@@ -12,7 +12,7 @@ defmodule Chopperbot.Router do
 
   post "/split" do
     input = conn.body_params["text"]
-    response = Character.happy_talk() <> "\n\n" <> Split.run(input)
+    response = build_response(input)
 
     body = %{
       "response_type" => "in_channel",
@@ -34,21 +34,15 @@ defmodule Chopperbot.Router do
     ] = conn.params["events"]
 
     response =
-      if text |> String.downcase() |> String.starts_with?("split") do
-        ["", input] = text |> String.downcase() |> String.split("split ")
-        Character.happy_talk() <> "\n\n" <> Split.run(input)
-      else
-        [
-          "Now I can help you split the bill 💸! Just type `split` following by orders. For example...",
-          "",
-          "1️⃣",
-          "split alice 100 alice 250 bob 200 +vat +service",
-          "2️⃣",
-          "split alice 100 bob 200 +v",
-          "3️⃣",
-          "split alice 100 bob 200 share 100",
-        ]
-        |> Enum.join("\n")
+      text
+      |> String.trim()
+      |> String.downcase()
+      |> case do
+        "split " <> input ->
+          build_response(input)
+
+        _ ->
+          build_line_suggestion_response()
       end
 
     Linex.Message.reply(response, reply_token)
@@ -60,5 +54,29 @@ defmodule Chopperbot.Router do
 
   match _ do
     send_resp(conn, 404, "not found")
+  end
+
+  defp build_response(input_text) do
+    case Split.run(input_text) do
+      {:ok, ok_msg} ->
+        Character.happy_talk() <> "\n\n" <> ok_msg
+
+      {:error, error_msg} ->
+        Character.confused_talk() <> "\n\n" <> error_msg
+    end
+  end
+
+  defp build_line_suggestion_response do
+    [
+      "Now I can help you split the bill 💸! Just type `split` following by orders. For example...",
+      "",
+      "1️⃣",
+      "split alice 100 alice 250 bob 200 +vat +service",
+      "2️⃣",
+      "split alice 100 bob 200 +v",
+      "3️⃣",
+      "split alice 100 bob 200 share 100"
+    ]
+    |> Enum.join("\n")
   end
 end
