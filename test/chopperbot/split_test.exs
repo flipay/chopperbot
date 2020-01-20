@@ -1,7 +1,5 @@
 defmodule Chopperbot.SplitTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
-  alias Chopperbot.Split
-
-  doctest Split, import: true
+  doctest Chopperbot.Split, import: true
 end
