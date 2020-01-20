@@ -14,7 +14,9 @@ You can get the help from chopper to calculate your bill with this syntax.
 ```
 /split NAME AMOUNT NAME AMOUNT ... [+v | +s]
 ```
-<img width="735" alt="image" src="https://user-images.githubusercontent.com/761819/71884549-2594ec80-316b-11ea-877d-746d60c25ac4.png">
+
+<img width="680" alt="Frame 1" src="https://user-images.githubusercontent.com/761819/72602332-ac0ab480-3949-11ea-96b8-5c61443cc4aa.png">
+
 
 The option can use to apply multiplication to all orders.   
 Note that the order of options matter in the calculation.
