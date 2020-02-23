@@ -21,6 +21,8 @@ use Mix.Config
 #     config :logger, level: :info
 #
 
+config :chopperbot, url: "http://localhost:4000"
+
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
 # by uncommenting the line below and defining dev.exs, test.exs and such.
@@ -28,3 +30,5 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 import_config "#{Mix.env()}.exs"
+
+import_config "appsignal.exs"

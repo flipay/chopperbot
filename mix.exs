@@ -27,7 +27,8 @@ defmodule Chopperbot.MixProject do
       {:money, "~> 1.4"},
       {:httpoison, "~> 1.6"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
+      {:appsignal, "~> 1.0"}
     ]
   end
 end
