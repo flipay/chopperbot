@@ -103,12 +103,19 @@ Test by posting json data to the endpoint
 
 For the first time, add the remote to Gigalixir.  
 `GIGALIXIR_REMOTE_URL` can be found in the setup instruction.  
-```
+```sh
 git remote add gigalixir GIGALIXIR_REMOTE_URL
 ```
 
-Once you have the gigalixir remote, just push to build.
+Configure the required variables.
+```sh
+gigalixir config:set APP_URL=XXX
+gigalixir config:set LINE_CHANNEL_ACCESS_TOKEN=YYY
+gigalixir config:set APPSIGNAL_API_KEY=ZZZ
 ```
+
+Once you have the gigalixir remote, just push to build.
+```sh
 git push gigalixir master
 ```
 
