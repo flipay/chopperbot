@@ -52,6 +52,10 @@ defmodule Chopperbot.Router do
     |> send_resp(200, Jason.encode!(%{}))
   end
 
+  get "/health" do
+    send_resp(conn, 200, "OK")
+  end
+
   match _ do
     send_resp(conn, 404, "not found")
   end
