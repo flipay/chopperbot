@@ -9,7 +9,7 @@ defmodule Chopperbot.Application do
     # List all child processes to be supervised
     children = [
       # Starts a worker by calling: Chopperbot.Worker.start_link(arg)
-      # {Chopperbot.Worker, arg}
+      {Chopperbot.Worker.HealthCheckWorker, nil},
       {Plug.Cowboy, scheme: :http, plug: Chopperbot.Router, options: [port: 4000]}
     ]
 
