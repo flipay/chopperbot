@@ -37,7 +37,7 @@ defmodule Chopperbot.Router do
           Split.process(normalized_text, for: :line)
 
         :error ->
-          build_suggestion_message()
+          build_line_suggestion_message()
       end
 
     @line_message.reply(message, reply_token)
@@ -65,7 +65,7 @@ defmodule Chopperbot.Router do
     end
   end
 
-  defp build_suggestion_message do
+  defp build_line_suggestion_message do
     [
       "Now I can help you split the bill 💸! Just type `split` following by orders. For example...",
       "",
