@@ -40,6 +40,26 @@ defmodule Chopperbot.RouterTest do
       assert Jason.decode!(conn.resp_body) == %{}
       verify!()
     end
+
+    test "sends a suggestion message if the given text is invalid" do
+      text = "slice chopper 100 luffy 200 +v"
+      reply_token = "token123"
+      params = %{"events" => [%{"message" => %{"text" => text}, "replyToken" => reply_token}]}
+
+      msg =
+        "Now I can help you split the bill 💸! Just type `split` following by orders. For example...\n\n1️⃣\nsplit alice 100 alice 250 bob 200 +vat +service\n2️⃣\nsplit alice 100 bob 200 +v\n3️⃣\nsplit alice 100 bob 200 share 100"
+
+      expect(Linex.TestMessage, :reply, fn ^msg, ^reply_token -> :ok end)
+
+      conn =
+        :post
+        |> conn("/line", params)
+        |> Router.call(@opts)
+
+      assert conn.status == 200
+      assert Jason.decode!(conn.resp_body) == %{}
+      verify!()
+    end
   end
 
   describe "request to invalid path" do

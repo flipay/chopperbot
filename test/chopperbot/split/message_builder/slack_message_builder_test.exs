@@ -1,17 +1,7 @@
-defmodule Chopperbot.SlackMessageBuilderTest do
+defmodule Chopperbot.Split.SlackMessageBuilderTest do
   use ExUnit.Case, async: true
 
-  alias Chopperbot.SlackMessageBuilder
-
-  describe "validate_text_input/1" do
-    test "returns {:ok, text}" do
-      text = "chopper 100 luffy 200 +v"
-
-      result = SlackMessageBuilder.validate_text_input(text)
-
-      assert result == {:ok, text}
-    end
-  end
+  alias Chopperbot.Split.SlackMessageBuilder
 
   describe "build_ok_message/1" do
     test "builds a message map for Slack from the given orders" do

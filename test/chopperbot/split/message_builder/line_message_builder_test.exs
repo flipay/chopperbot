@@ -1,37 +1,7 @@
-defmodule Chopperbot.LineMessageBuilderTest do
+defmodule Chopperbot.Split.LineMessageBuilderTest do
   use ExUnit.Case, async: true
 
-  alias Chopperbot.LineMessageBuilder
-
-  describe "validate_text_input/1" do
-    test "returns {:error, suggestion_text} if the given text has invalid format" do
-      [
-        "slice chopper 100 luffy 200 +v",
-        "chopper 100 luffy 200 +v"
-      ]
-      |> Enum.each(fn text ->
-        result = LineMessageBuilder.validate_text_input(text)
-
-        assert {:error, suggestion_text} = result
-
-        assert suggestion_text =~
-                 "Now I can help you split the bill 💸! Just type `split` following by orders."
-      end)
-    end
-
-    test "returns {:ok, text} if the given text has valid format" do
-      [
-        "Split chopper 100 luffy 200 +v",
-        " split chopper 100 luffy 200 +v ",
-        "split chopper 100 luffy 200 +v"
-      ]
-      |> Enum.each(fn text ->
-        result = LineMessageBuilder.validate_text_input(text)
-
-        assert result == {:ok, "chopper 100 luffy 200 +v"}
-      end)
-    end
-  end
+  alias Chopperbot.Split.LineMessageBuilder
 
   describe "build_ok_message/1" do
     test "builds a Line flex message from the given orders" do

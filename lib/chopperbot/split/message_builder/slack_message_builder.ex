@@ -1,12 +1,7 @@
-defmodule Chopperbot.SlackMessageBuilder do
-  @behaviour Chopperbot.MessageBuilder
+defmodule Chopperbot.Split.SlackMessageBuilder do
+  @behaviour Chopperbot.Split.MessageBuilder
 
   alias Chopperbot.{Character, MoneyFormatter}
-
-  @impl true
-  def validate_text_input(text) do
-    {:ok, text}
-  end
 
   @impl true
   def build_ok_message(orders) do

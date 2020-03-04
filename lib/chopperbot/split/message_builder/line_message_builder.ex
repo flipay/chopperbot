@@ -1,33 +1,7 @@
-defmodule Chopperbot.LineMessageBuilder do
-  @behaviour Chopperbot.MessageBuilder
+defmodule Chopperbot.Split.LineMessageBuilder do
+  @behaviour Chopperbot.Split.MessageBuilder
 
   alias Chopperbot.{Character, MoneyFormatter}
-
-  @suggestion_text [
-                     "Now I can help you split the bill 💸! Just type `split` following by orders. For example...",
-                     "",
-                     "1️⃣",
-                     "split alice 100 alice 250 bob 200 +vat +service",
-                     "2️⃣",
-                     "split alice 100 bob 200 +v",
-                     "3️⃣",
-                     "split alice 100 bob 200 share 100"
-                   ]
-                   |> Enum.join("\n")
-
-  @impl true
-  def validate_text_input(text) do
-    text
-    |> String.trim()
-    |> String.downcase()
-    |> case do
-      "split " <> input ->
-        {:ok, input}
-
-      _ ->
-        {:error, @suggestion_text}
-    end
-  end
 
   @impl true
   def build_ok_message(orders) do
