@@ -36,7 +36,7 @@ defmodule Linex.MessageTest do
         capture_log(fn ->
           result = Linex.Message.reply(message, reply_token, url)
 
-          assert result == :error
+          assert result == {:error, %Linex.Error{code: 401, message: "boom!"}}
         end)
 
       assert log_error_msg =~ "boom!"
