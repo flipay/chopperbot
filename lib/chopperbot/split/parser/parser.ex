@@ -18,15 +18,15 @@ defmodule Chopperbot.Split.Parser do
       {:ok, %{orders: [{"a", 100.0}, {"b", 300.0}], multiplier: 0.5}}
 
       iex> parse("a 100 b 300 +t +invalid")
-      {:error, :invalid_option, ["+t", "+invalid"]}
+      {:error, "invalid options: +t, +invalid"}
 
       iex> parse("a one-hundred b ten baht +v +s")
-      {:error, :invalid_input, ["one-hundred", "ten", "baht"]}
+      {:error, "invalid inputs: one-hundred, ten, baht"}
   """
   @spec parse(String.t()) ::
           {:ok, %{orders: [Order.t()], multiplier: float()}}
-          | {:error, :invalid_option, [String.t()]}
-          | {:error, :invalid_input, [String.t()]}
+          | {:error, String.t()}
+          | {:error, String.t()}
   def parse(text) do
     {options, inputs} =
       text
@@ -36,6 +36,12 @@ defmodule Chopperbot.Split.Parser do
     with {:ok, multiplier} <- OptionTransformer.transform(options),
          {:ok, orders} <- InputTransformer.transform(inputs) do
       {:ok, %{orders: orders, multiplier: multiplier}}
+    else
+      {:error, :invalid_option, invalid_options} ->
+        {:error, "invalid options: " <> Enum.join(invalid_options, ", ")}
+
+      {:error, :invalid_input, invalid_inputs} ->
+        {:error, "invalid inputs: " <> Enum.join(invalid_inputs, ", ")}
     end
   end
 

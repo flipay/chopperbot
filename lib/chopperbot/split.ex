@@ -11,12 +11,7 @@ defmodule Chopperbot.Split do
         |> OrderCalculator.calculate(multiplier)
         |> message_builder.build_ok_message()
 
-      {:error, :invalid_input, invalid_inputs} ->
-        error_text = "invalid inputs: " <> Enum.join(invalid_inputs, ", ")
-        message_builder.build_error_message(error_text)
-
-      {:error, :invalid_option, invalid_options} ->
-        error_text = "invalid options: " <> Enum.join(invalid_options, ", ")
+      {:error, error_text} ->
         message_builder.build_error_message(error_text)
     end
   end
