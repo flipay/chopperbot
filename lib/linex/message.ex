@@ -5,7 +5,7 @@ defmodule Linex.Message do
 
   @reply_url "https://api.line.me/v2/bot/message/reply"
 
-  @callback reply(map(), String.t()) :: :ok | :error
+  @callback reply(map(), String.t()) :: :ok | {:error, Error.t()}
 
   @doc """
   Reply the message users send to the channel.
