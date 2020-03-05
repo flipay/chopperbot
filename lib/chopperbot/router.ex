@@ -40,11 +40,17 @@ defmodule Chopperbot.Router do
           build_line_suggestion_message()
       end
 
-    @line_message.reply(message, reply_token)
+    case @line_message.reply(message, reply_token) do
+      :ok ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode!(%{}))
 
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(%{}))
+      {:error, error} ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(error.code, Jason.encode!(error))
+    end
   end
 
   get "/health" do

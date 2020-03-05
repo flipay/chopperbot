@@ -60,6 +60,34 @@ defmodule Chopperbot.RouterTest do
       assert Jason.decode!(conn.resp_body) == %{}
       verify!()
     end
+
+    test "returns error response if message cannot be sent" do
+      text = "split chopper 100 luffy 200 +v"
+      reply_token = "token123"
+      params = %{"events" => [%{"message" => %{"text" => text}, "replyToken" => reply_token}]}
+
+      expect(Linex.TestMessage, :reply, fn _, ^reply_token ->
+        {:error,
+         %Linex.Error{
+           code: 401,
+           message: "Authorization header required."
+         }}
+      end)
+
+      conn =
+        :post
+        |> conn("/line", params)
+        |> Router.call(@opts)
+
+      assert conn.status == 401
+
+      assert Jason.decode!(conn.resp_body) == %{
+               "code" => 401,
+               "message" => "Authorization header required."
+             }
+
+      verify!()
+    end
   end
 
   describe "request to invalid path" do
