@@ -1,10 +1,8 @@
 defmodule Chopperbot.Split.SlackMessageBuilder do
-  @behaviour Chopperbot.Split.MessageBuilder
-
-  alias Chopperbot.{Character, MoneyFormatter}
+  use Chopperbot.Split.MessageBuilder
 
   @impl true
-  def build_ok_message(%{orders: orders, total: total}) do
+  def build_ok_message(%CalculatedOrdersResult{orders: orders, total: total}) do
     orders_summary_text =
       orders
       |> Enum.map(fn {name, amount} -> "#{name}: #{MoneyFormatter.format(amount)}" end)

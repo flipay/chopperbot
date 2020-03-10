@@ -1,6 +1,19 @@
 defmodule Chopperbot.Split.MessageBuilder do
   alias Chopperbot.Split.CalculatedOrdersResult
 
+  defmacro __using__(_) do
+    quote do
+      @behaviour Chopperbot.Split.MessageBuilder
+
+      alias Chopperbot.{
+        Character,
+        MoneyFormatter
+      }
+
+      alias Chopperbot.Split.CalculatedOrdersResult
+    end
+  end
+
   @callback build_ok_message(CalculatedOrdersResult.t()) :: map()
   @callback build_error_message(String.t()) :: map()
 
