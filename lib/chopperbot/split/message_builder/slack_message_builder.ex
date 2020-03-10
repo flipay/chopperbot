@@ -4,13 +4,11 @@ defmodule Chopperbot.Split.SlackMessageBuilder do
   alias Chopperbot.{Character, MoneyFormatter}
 
   @impl true
-  def build_ok_message(orders) do
+  def build_ok_message(%{orders: orders, total: total}) do
     orders_summary_text =
       orders
-      |> Enum.map(fn
-        {"_total", amount} -> "---\n*total: #{MoneyFormatter.format(amount)}*"
-        {name, amount} -> "#{name}: #{MoneyFormatter.format(amount)}"
-      end)
+      |> Enum.map(fn {name, amount} -> "#{name}: #{MoneyFormatter.format(amount)}" end)
+      |> List.insert_at(-1, "---\n*total: #{MoneyFormatter.format(total)}*")
       |> Enum.join("\n")
 
     %{

@@ -1,5 +1,8 @@
 defmodule Chopperbot.Split.OrderCalculator do
-  alias Chopperbot.Split.Order
+  alias Chopperbot.Split.{
+    CalculatedOrdersResult,
+    Order
+  }
 
   @type orders :: [Order.t()]
 
@@ -8,21 +11,35 @@ defmodule Chopperbot.Split.OrderCalculator do
 
   ## Examples
       iex> calculate([{"a", 100}, {"b", 200}, {"c", 300}], 1.177)
-      [{"a", 117.7}, {"b", 235.4}, {"c", 353.1}, {"_total", 706.2}]
+      %Chopperbot.Split.CalculatedOrdersResult{
+        orders: [{"a", 117.7}, {"b", 235.4}, {"c", 353.1}],
+        total: 706.2
+      }
 
       iex> calculate([{"a", 100}, {"b", 200}, {"a", 300}], 1.177)
-      [{"a", 470.8}, {"b", 235.4}, {"_total", 706.2}]
+      %Chopperbot.Split.CalculatedOrdersResult{
+        orders: [{"a", 470.8}, {"b", 235.4}],
+        total: 706.2
+      }
 
       iex> calculate([{"a", 100}, {"b", 200}, {"c", 300}, {"share", 300}], 1.177)
-      [{"a", 235.4}, {"b", 353.1}, {"c", 470.8}, {"_total", 1059.3}]
+      %Chopperbot.Split.CalculatedOrdersResult{
+        orders: [{"a", 235.4}, {"b", 353.1}, {"c", 470.8}],
+        total: 1059.3
+      }
   """
-  @spec calculate(orders(), float()) :: orders()
+  @spec calculate(orders(), float()) :: CalculatedOrdersResult.t()
   def calculate(orders, multiplier) do
-    orders
-    |> sum_orders_by_name()
-    |> split_share()
-    |> apply_multiplier(multiplier)
-    |> add_total()
+    uniq_orders =
+      orders
+      |> sum_orders_by_name()
+      |> split_share()
+      |> apply_multiplier(multiplier)
+
+    %CalculatedOrdersResult{
+      orders: uniq_orders,
+      total: sum_orders_amount(uniq_orders)
+    }
   end
 
   @doc """
@@ -71,18 +88,6 @@ defmodule Chopperbot.Split.OrderCalculator do
       new_amount = Float.round(amount * multiplier, 15)
       {name, new_amount}
     end)
-  end
-
-  @doc """
-  Add _total amount to orders.
-
-  ## Examples
-      iex> add_total([{"a", 300}, {"b", 300}, {"c", 400}])
-      [{"a", 300}, {"b", 300}, {"c", 400}, {"_total", 1000}]
-  """
-  @spec add_total(orders()) :: orders()
-  def add_total(orders) do
-    orders ++ [{"_total", sum_orders_amount(orders)}]
   end
 
   defp sum_orders_amount(orders) do

@@ -4,62 +4,58 @@ defmodule Chopperbot.Split.LineMessageBuilder do
   alias Chopperbot.{Character, MoneyFormatter}
 
   @impl true
-  def build_ok_message(orders) do
+  def build_ok_message(%{orders: orders, total: total}) do
     orders_summary_contents =
-      Enum.flat_map(orders, fn
-        {"_total", amount} ->
-          [
+      orders
+      |> Enum.map(fn {name, amount} ->
+        %{
+          type: "box",
+          layout: "horizontal",
+          contents: [
             %{
-              type: "separator",
-              margin: "xxl"
+              type: "text",
+              text: name,
+              size: "sm",
+              color: "#555555",
+              flex: 0
             },
             %{
-              type: "box",
-              layout: "horizontal",
-              contents: [
-                %{
-                  type: "text",
-                  text: "TOTAL",
-                  size: "sm",
-                  color: "#555555",
-                  weight: "bold"
-                },
-                %{
-                  type: "text",
-                  text: MoneyFormatter.format(amount),
-                  size: "sm",
-                  color: "#111111",
-                  align: "end",
-                  weight: "bold"
-                }
-              ]
+              type: "text",
+              text: MoneyFormatter.format(amount),
+              size: "sm",
+              color: "#111111",
+              align: "end"
             }
           ]
-
-        {name, amount} ->
-          [
-            %{
-              type: "box",
-              layout: "horizontal",
-              contents: [
-                %{
-                  type: "text",
-                  text: name,
-                  size: "sm",
-                  color: "#555555",
-                  flex: 0
-                },
-                %{
-                  type: "text",
-                  text: MoneyFormatter.format(amount),
-                  size: "sm",
-                  color: "#111111",
-                  align: "end"
-                }
-              ]
-            }
-          ]
+        }
       end)
+      |> Enum.concat([
+        %{
+          type: "separator",
+          margin: "xxl"
+        },
+        %{
+          type: "box",
+          layout: "horizontal",
+          contents: [
+            %{
+              type: "text",
+              text: "TOTAL",
+              size: "sm",
+              color: "#555555",
+              weight: "bold"
+            },
+            %{
+              type: "text",
+              text: MoneyFormatter.format(total),
+              size: "sm",
+              color: "#111111",
+              align: "end",
+              weight: "bold"
+            }
+          ]
+        }
+      ])
 
     %{
       type: "flex",

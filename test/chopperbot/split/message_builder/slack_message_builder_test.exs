@@ -1,13 +1,16 @@
 defmodule Chopperbot.Split.SlackMessageBuilderTest do
   use ExUnit.Case, async: true
 
-  alias Chopperbot.Split.SlackMessageBuilder
+  alias Chopperbot.Split.{CalculatedOrdersResult, SlackMessageBuilder}
 
   describe "build_ok_message/1" do
     test "builds a message map for Slack from the given orders" do
-      orders = [{"chopper", 100}, {"luffy", 200}, {"_total", 300}]
+      calculated_orders_result = %CalculatedOrdersResult{
+        orders: [{"chopper", 100}, {"luffy", 200}],
+        total: 300
+      }
 
-      result = SlackMessageBuilder.build_ok_message(orders)
+      result = SlackMessageBuilder.build_ok_message(calculated_orders_result)
 
       assert %{response_type: "in_channel", text: text} = result
       assert text =~ "chopper: 100.00 THB\nluffy: 200.00 THB\n---\n*total: 300.00 THB*"

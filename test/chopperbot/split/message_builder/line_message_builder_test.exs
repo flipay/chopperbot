@@ -1,13 +1,16 @@
 defmodule Chopperbot.Split.LineMessageBuilderTest do
   use ExUnit.Case, async: true
 
-  alias Chopperbot.Split.LineMessageBuilder
+  alias Chopperbot.Split.{CalculatedOrdersResult, LineMessageBuilder}
 
   describe "build_ok_message/1" do
     test "builds a Line flex message from the given orders" do
-      orders = [{"chopper", 100}, {"luffy", 200}, {"_total", 300}]
+      calculated_orders_result = %CalculatedOrdersResult{
+        orders: [{"chopper", 100}, {"luffy", 200}],
+        total: 300
+      }
 
-      result = LineMessageBuilder.build_ok_message(orders)
+      result = LineMessageBuilder.build_ok_message(calculated_orders_result)
 
       assert %{
                altText: "Orders summary",

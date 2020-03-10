@@ -1,7 +1,7 @@
 defmodule Chopperbot.Split.MessageBuilder do
-  alias Chopperbot.Split.Order
+  alias Chopperbot.Split.CalculatedOrdersResult
 
-  @callback build_ok_message([Order.t()]) :: map()
+  @callback build_ok_message(CalculatedOrdersResult.t()) :: map()
   @callback build_error_message(String.t()) :: map()
 
   @spec from_platform(atom()) :: module()
