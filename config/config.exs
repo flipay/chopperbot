@@ -4,6 +4,10 @@ use Mix.Config
 
 config :chopperbot, port: String.to_integer(System.get_env("PORT") || "4000")
 
+config :chopperbot, Chopperbot.Split.MessageBuilder,
+  line: Chopperbot.Split.LineMessageBuilder,
+  slack: Chopperbot.Split.SlackMessageBuilder
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,

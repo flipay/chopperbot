@@ -6,6 +6,7 @@ defmodule Chopperbot.MixProject do
       app: :chopperbot,
       version: "0.1.0",
       elixir: "~> 1.8",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -19,6 +20,10 @@ defmodule Chopperbot.MixProject do
     ]
   end
 
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -26,6 +31,8 @@ defmodule Chopperbot.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:money, "~> 1.4"},
       {:httpoison, "~> 1.6"},
+      {:mox, "~> 0.5", only: :test},
+      {:bypass, "~> 1.0", only: :test},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
       {:appsignal, "~> 1.0"}

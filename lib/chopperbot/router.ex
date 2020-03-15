@@ -1,27 +1,25 @@
 defmodule Chopperbot.Router do
   use Plug.Router
-  alias Chopperbot.{Character, Split}
 
-  plug(:match)
-  plug(Plug.Parsers, parsers: [:json, :urlencoded], json_decoder: Jason)
-  plug(:dispatch)
+  alias Chopperbot.Split
+
+  @line_message Linex.get_conf(:message)
+
+  plug :match
+  plug Plug.Parsers, parsers: [:json, :urlencoded], json_decoder: Jason
+  plug :dispatch
 
   post "/hello" do
     send_resp(conn, 200, "world")
   end
 
   post "/split" do
-    input = conn.body_params["text"]
-    response = build_response(input)
-
-    body = %{
-      "response_type" => "in_channel",
-      "text" => response
-    }
+    text = conn.body_params["text"]
+    message = Split.process(text, for: :slack)
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(body))
+    |> send_resp(200, Jason.encode!(message))
   end
 
   post "/line" do
@@ -33,23 +31,26 @@ defmodule Chopperbot.Router do
       | _
     ] = conn.params["events"]
 
-    response =
-      text
-      |> String.trim()
-      |> String.downcase()
-      |> case do
-        "split " <> input ->
-          build_response(input)
+    message =
+      case normalize_text_input(text) do
+        {:ok, normalized_text} ->
+          Split.process(normalized_text, for: :line)
 
-        _ ->
-          build_line_suggestion_response()
+        :error ->
+          build_line_suggestion_message()
       end
 
-    Linex.Message.reply(response, reply_token)
+    case @line_message.reply(message, reply_token) do
+      :ok ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode!(%{}))
 
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(%{}))
+      {:error, error} ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(error.code, Jason.encode!(error))
+    end
   end
 
   get "/health" do
@@ -60,17 +61,17 @@ defmodule Chopperbot.Router do
     send_resp(conn, 404, "not found")
   end
 
-  defp build_response(input_text) do
-    case Split.run(input_text) do
-      {:ok, ok_msg} ->
-        Character.happy_talk() <> "\n\n" <> ok_msg
-
-      {:error, error_msg} ->
-        Character.confused_talk() <> "\n\n" <> error_msg
+  defp normalize_text_input(text) do
+    text
+    |> String.trim()
+    |> String.downcase()
+    |> case do
+      "split " <> input -> {:ok, input}
+      _ -> :error
     end
   end
 
-  defp build_line_suggestion_response do
+  defp build_line_suggestion_message do
     [
       "Now I can help you split the bill 💸! Just type `split` following by orders. For example...",
       "",
