@@ -8,7 +8,10 @@ defmodule Chopperbot.MixProject do
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_core_path: "_build/#{Mix.env()}"
+      ]
     ]
   end
 
