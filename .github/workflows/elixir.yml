@@ -6,15 +6,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    container:
-      image: elixir:1.10.2-slim
+    strategy:
+      matrix:
+        otp: [22.2]
+        elixir: [1.10.2]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-elixir@v1
+      with:
+        otp-version: ${{ matrix.otp }}
+        elixir-version: ${{ matrix.elixir }}
     - uses: actions/cache@v1
       with:
         path: _build
-        key: build-${{ hashFiles('mix.lock') }}
+        key: build-erlang-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
     - name: Install Dependencies
       run: |
         mix local.rebar --force
