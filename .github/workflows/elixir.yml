@@ -6,6 +6,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    name: Erlang ${{ matrix.otp }} / Elixir ${{ matrix.elixir }}
+
     strategy:
       matrix:
         otp: [22.2]
